@@ -96,6 +96,19 @@ class ProductService {
         )
         return searchItemInfo
     }
+
+    async getItemNumber(id) {
+        console.log(id)
+        const newID = id.replace(/^ID/, '');
+        const currentItem = await Product.findOne({
+            where: {
+                product_id: newID
+            }
+        });
+        console.log(currentItem)
+        const currentNumber = currentItem.in_stock;
+        return currentNumber
+    }
 }
 
 module.exports = new ProductService();

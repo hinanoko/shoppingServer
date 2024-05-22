@@ -1,5 +1,5 @@
-const { addNewItem, takeAllItem, updateItem, deleteOneItem, deleteAllItem } = require('../service/cart.service')
-const { deleteProduct } = require('../service/product.service')
+const { addNewItem, takeAllItem, updateItem, deleteOneItem, deleteAllItem, addOneItem, decreaseOneItem } = require('../service/cart.service')
+const { deleteProduct, getItemNumber } = require('../service/product.service')
 
 class CartController {
     async goUpdateItem(ctx) {
@@ -57,6 +57,54 @@ class CartController {
         const deleteAllInfo = await deleteAllItem()
         ctx.body = {
             deleteAllInfo
+        }
+    }
+
+    async goAddOneItem(ctx) {
+        const productId = ctx.request.body.productId; // 假设前端传递了 productId
+
+        // 获取当前库存数量
+        const currentStock = await getItemNumber(productId);
+        console.log('Current stock:', currentStock);
+
+        if (currentStock > 0) {
+            // 执行加一操作
+            const addRes = await addOneItem(productId);
+            if (addRes.success) {
+                ctx.body = {
+                    success: true,
+                    message: addRes.message,
+                    currentStock: currentStock + 1
+                };
+            } else {
+                ctx.body = {
+                    success: false,
+                    message: addRes.message
+                };
+            }
+        } else {
+            ctx.body = {
+                success: false,
+                message: 'Out of stock'
+            };
+        }
+    }
+
+    async goDecreaseOneItem(ctx) {
+        const productId = ctx.request.body.productId;
+
+        const addRes = await decreaseOneItem(productId);
+
+        if (addRes.success) {
+            ctx.body = {
+                success: true,
+                message: addRes.message,
+            };
+        } else {
+            ctx.body = {
+                success: false,
+                message: addRes.message
+            };
         }
     }
 }

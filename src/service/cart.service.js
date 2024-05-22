@@ -51,6 +51,45 @@ class CartService {
 
         return deleteAllInfo;
     }
+
+    async addOneItem(id) {
+        const currentItem = await Cart.findOne({
+            where: {
+                product_id: id
+            }
+        });
+        const currentStock = currentItem.product_number;
+
+        // 执行加一操作
+        if (currentStock > 0) {
+            const updatedStock = currentStock + 1;
+            await Cart.update({ product_number: updatedStock }, { where: { product_id: id } });
+            return { success: true, message: 'Item added successfully' };
+        } else {
+            return { success: false, message: 'Out of stock' };
+        }
+    }
+
+    async decreaseOneItem(id) {
+        const currentItem = await Cart.findOne({
+            where: {
+                product_id: id
+            }
+        });
+        console.log(currentItem)
+        const currentStock = currentItem.product_number;
+
+        // 执行加一操作
+        if (currentStock > 0) {
+            const updatedStock = currentStock - 1;
+            await Cart.update({ product_number: updatedStock }, { where: { product_id: id } });
+            return { success: true, message: 'Item added successfully' };
+        } else {
+            return { success: false, message: 'Out of stock' };
+        }
+    }
+
+
 }
 
 module.exports = new CartService();
